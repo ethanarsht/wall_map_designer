@@ -1,5 +1,6 @@
 
 
+library(shiny)
 
 shinyServer(function(input, output, server) {
   
@@ -45,7 +46,7 @@ shinyServer(function(input, output, server) {
   })
   
   observeEvent(input$submit_address, {
-    geo_address <<- paste0(input$address_user, ", ", input$city_user, ", ", 
+    geo_address <- paste0(input$address_user, ", ", input$city_user, ", ", 
                           input$province_user, ", ", input$country_user)
     
     df_address <- data.frame(
@@ -61,10 +62,7 @@ shinyServer(function(input, output, server) {
     leafletProxy('map') %>%
       setView(
         lng = reverse[[1, 'long']], lat = reverse[[1, 'lat']], zoom = 12
-      ) %>%
-      clearGroup('city_outline')
-    
-    outline_binary <<- FALSE
+      )
   })
   
   
@@ -80,99 +78,16 @@ shinyServer(function(input, output, server) {
   output$lat <- renderText(current_center()$lat[1])
   output$zoom <- renderText(current_zoom())
   
-  observeEvent(input$submit_address, {
-    if (input$city_user != "") {
-      output$outline_functionality <- renderUI({
-        actionButton('add_outline', "Show only city")
-      })
-    }
-  })
-  
-  
-  
-  observeEvent(input$add_outline, {
-    outline <<- as_Spatial(get_city_boundaries(address_str = geo_address))
-    
-    wld <- raster::rasterToPolygons(raster::raster(ncol = 1, nrow = 1, crs = proj4string(outline)))
-    
-    msk <- gDifference(wld, outline)
-    
-   
-    leafletProxy('map') %>%
-      clearGroup('city_outline') %>%
-      addPolygons(
-        data = msk,
-        fillOpacity = 1,
-        color = 'white',
-        group = 'city_outline'
-      )
-    
-    output$outline_functionality <- renderUI(
-      tagList(
-        actionButton('remove_outline', 'Show all'),
-        actionButton('backup_outline', 'Backup method')
-      )
-    )
-    
-    outline_binary <<- TRUE
-  })
-  
-  observeEvent(input$backup_outline, {
-    outline <<- as_Spatial(get_city_boundaries_old(address_str = geo_address))
-    
-    wld <- raster::rasterToPolygons(raster::raster(ncol = 1, nrow = 1, crs = proj4string(outline)))
-    
-    msk <- gDifference(wld, outline)
-    
-    
-    leafletProxy('map') %>%
-      clearGroup('city_outline') %>%
-      addPolygons(
-        data = msk,
-        fillOpacity = 1,
-        color = 'white',
-        group = 'city_outline'
-      )
-  })
-  
-  observeEvent(input$remove_outline, {
-    
-    outline_binary <<- FALSE
-    leafletProxy('map') %>%
-      clearGroup('city_outline')
-    
-    output$outline_functionality <- renderUI({
-      actionButton('add_outline', "Show only city")
-    })
-    
-    print(input$add_outline)
-  })
-  
   observeEvent(input$create, {
-    print(input$use_city_boundaries)
-    print(geo_address)
     output$statusmessage <- renderText("Rendering...")
     Sys.sleep(1)
     print_m <<- make_map(current_center()$lng[1], current_center()$lat[1],
-                         zoom = input$map_zoom,
-                         title = input$title,
-                         tile = input$tile,
-                         location = input$subtitle,
-                         width = input$map_width,
-                         height = input$map_height,
-                         outline_ind = outline_binary,
-                         boundary_input = outline)
-    # } else {
-    #   print_m <<- make_map(current_center()$lng[1], current_center()$lat[1],
-    #                        zoom = input$map_zoom,
-    #                        title = input$title,
-    #                        tile = input$tile,
-    #                        location = input$subtitle,
-    #                        width = input$map_width,
-    #                        height = input$map_height,
-    #                        outline_ind = outline_binary)
-    # }
-    
+                        zoom = input$map_zoom,
+                        title = input$title,
+                        tile = input$tile,
+                        location = input$subtitle,
+                        width = input$map_width,
+                        height = input$map_height)
     
     output$statusmessage <- renderText('Ready for download')
 
