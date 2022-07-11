@@ -1,9 +1,8 @@
-library(leaflet)
 
-library(shiny)
 
 
 shinyUI(fluidPage(
+  useShinyjs(),
   shinyWidgets::setBackgroundColor("#f3f4f5"),
 
   titlePanel('Make your own wall map'),
@@ -28,7 +27,7 @@ shinyUI(fluidPage(
                     numericInput('lat_user', 'Latitude', value = 0)
              )
            ),
-           actionButton('submit_coords', 'Submit coordinates')
+           actionButton('submit_coords', 'Submit coordinates'),
           ),
     column(width = 6,
            fluidRow(
@@ -37,7 +36,9 @@ shinyUI(fluidPage(
              textInput('city_user', 'City'),
              textInput('address_user', 'Street address')
            ),
-           actionButton('submit_address', 'Submit address')),
+           actionButton('submit_address', 'Submit address'),
+           uiOutput('outline_functionality')
+           ),
     
     textInput('title', 'Title'),
     textInput('subtitle', 'Subtitle'),

@@ -6,16 +6,45 @@ library(htmlwidgets)
 
 mapviewOptions(platform = "leaflet", mapview.maxpixels = Inf, plainview.maxpixels = Inf, raster.size = Inf)
 
-make_map <- function(lng, lat, zoom, title, location, tile, width, height) {
-  # lng = 5.1225301
-  # lat = 52.0734346
-  # zoom = 16
-  # title = 'Miami'
-  # location = 'Florida'
+make_map <- function(lng, lat, zoom, title, location, tile, width, height, 
+                      boundary_input = NULL, outline_ind) {
   
-  # tile <- 'https://api.mapbox.com/styles/v1/ethanarsht/ckzh1dxab009h14l85ghq6ccm/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZXRoYW5hcnNodCIsImEiOiJja3p4emVycHgwNmpuMnBwY296emJkdG5nIn0.WH_aegqXnpfsAQ-OrdIJeA'
-  m <- leaflet() %>%
-    addTiles(urlTemplate = tile) %>%
+  # get outline of selected municipality
+  
+  # lng = 28.7319989
+  # lat = 41.0049823
+  # zoom = 11
+  # title = 'Bidhannagar'
+  # location = 'West Bengal'
+  # tile <- 'https://api.mapbox.com/styles/v1/ethanarsht/ckzfu0dww001u14mz9crqmw71/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZXRoYW5hcnNodCIsImEiOiJja3p4emVycHgwNmpuMnBwY296emJkdG5nIn0.WH_aegqXnpfsAQ-OrdIJeA'
+  # width = 700
+  # height = 700
+  # geo_address = "Istanbul, Turkey"
+  
+  if (outline_ind == TRUE) {
+    outline <- boundary_input
+    
+    wld <- raster::rasterToPolygons(raster::raster(ncol = 1, nrow = 1, crs = proj4string(outline)))
+    
+    msk <- gDifference(wld, outline)
+    
+    m <- msk %>% 
+      leaflet() %>%
+      addTiles(urlTemplate = tile) %>%
+      addPolygons(
+        
+        fillOpacity = 1,
+        color = 'white'
+      ) %>%
+      setView(lng = lng, lat = lat, zoom = zoom)
+    
+  } else {
+    m <- leaflet() %>%
+      addTiles(urlTemplate = tile) %>%
+      setView(lng = lng, lat = lat, zoom = zoom)
+  }
+  
+  
     # addProviderTiles(providers$Stamen.Watercolor) %>%
     # addCircleMarkers(
     #   lng = 5.1225301,
@@ -26,7 +55,9 @@ make_map <- function(lng, lat, zoom, title, location, tile, width, height) {
     #   fillOpacity = .75,
     #   radius = 12
     # ) %>%
-    setView(lng = lng, lat = lat, zoom = zoom)
+  
+  
+  
   
   mapshot(m, file = "temp.png", selfcontained = FALSE, zoom = 2,
           vwidth = width, vheight = height
@@ -58,7 +89,12 @@ make_map <- function(lng, lat, zoom, title, location, tile, width, height) {
   return(i_crop)
 }
 
-# s <- make_map(lng = 88.4522, lat = 22.57849, zoom = 13, title = 'Bidhannagar', location = 'West Bengal')
+# s <- make_map(lng = 4.35, lat = 50.8, zoom = 10, title = 'Bidhannagar', location = 'West Bengal',
+#               tile <- 'https://api.mapbox.com/styles/v1/ethanarsht/ckzh1dxab009h14l85ghq6ccm/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZXRoYW5hcnNodCIsImEiOiJja3p4emVycHgwNmpuMnBwY296emJkdG5nIn0.WH_aegqXnpfsAQ-OrdIJeA',
+#               width = 400,
+#               height = 400,
+#               outline_city = ", Brussels, , "
+# )
 
 
 # image_write(s, 'bidhannagar.png')
