@@ -6,14 +6,14 @@ library(htmlwidgets)
 
 mapviewOptions(platform = "leaflet", mapview.maxpixels = Inf, plainview.maxpixels = Inf, raster.size = Inf)
 
-make_map <- function(lng, lat, zoom, title, location, tile) {
+make_map <- function(lng, lat, zoom, title, location, tile, width, height) {
   # lng = 5.1225301
   # lat = 52.0734346
-  # zoom = 14
+  # zoom = 16
   # title = 'Miami'
   # location = 'Florida'
   
-  # tile <- 'https://api.mapbox.com/styles/v1/ethanarsht/ckzh1dxab009h14l85ghq6ccm/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZXRoYW5hcnNodCIsImEiOiJjaW5hc3Byd3kwaHR1dThsd20yazIyeGJ0In0.iv93g_tMGrXHNt5eLWFYNw'
+  # tile <- 'https://api.mapbox.com/styles/v1/ethanarsht/ckzh1dxab009h14l85ghq6ccm/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiZXRoYW5hcnNodCIsImEiOiJja3p4emVycHgwNmpuMnBwY296emJkdG5nIn0.WH_aegqXnpfsAQ-OrdIJeA'
   m <- leaflet() %>%
     addTiles(urlTemplate = tile) %>%
     # addProviderTiles(providers$Stamen.Watercolor) %>%
@@ -29,13 +29,13 @@ make_map <- function(lng, lat, zoom, title, location, tile) {
     setView(lng = lng, lat = lat, zoom = zoom)
   
   mapshot(m, file = "temp.png", selfcontained = FALSE, zoom = 2,
-          vwidth = 992, vheight = 992
+          vwidth = width, vheight = height
           )
 
   i <- image_read('temp.png')
   
   i_crop <- i %>%
-    image_crop('1400X800', gravity = 'center') %>%
+    # image_crop('1400X800', gravity = 'center') %>%
     image_border('gray', '10x10') %>%
     image_border('white', '200x200+100+100') %>%
     # image_crop('800x950', gravity = 'south') %>%

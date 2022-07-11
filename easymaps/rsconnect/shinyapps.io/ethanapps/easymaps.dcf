@@ -1,0 +1,13 @@
+name: easymaps
+title: easymaps
+username:
+account: ethanapps
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6525307
+bundleId: 6028241
+url: https://ethanapps.shinyapps.io/easymaps/
+when: 1655828075.12468
+lastSyncTime: 1655828075.12468
+asMultiple: FALSE
+asStatic: FALSE
