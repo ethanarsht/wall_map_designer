@@ -65,8 +65,10 @@ make_map <- function(lng, lat, zoom, title, location, tile, width, height,
 
   i <- image_read('temp.png')
   
+  ii <- image_info(i)
+  
   i_crop <- i %>%
-    # image_crop('1400X800', gravity = 'center') %>%
+    image_crop(str_c(ii$width - 75, "x", ii$height - 75, "+0+0"), gravity = 'center') %>%
     image_border('gray', '10x10') %>%
     image_border('white', '200x200+100+100') %>%
     # image_crop('800x950', gravity = 'south') %>%
