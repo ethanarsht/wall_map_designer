@@ -27,6 +27,17 @@ shinyServer(function(input, output, server) {
       setView(lng = 0, lat = 0, zoom = 1)
   })
   
+  observeInput(input$map_height | input$map_width, {
+    output$map <- renderLeaflet({
+      leaflet() %>%
+        addTiles(urlTemplate = input$tile) %>%
+        setView(lng = current_center()$lng[1], lat = current_center()$lat[1],
+                zoom = current_zoom())
+    })
+    
+    
+  }) 
+  
   observeEvent(input$tile,
                {
                  leafletProxy('map') %>%
@@ -35,6 +46,10 @@ shinyServer(function(input, output, server) {
                            lat = current_center()$lat[1],
                            zoom = current_zoom()
                    )
+                 
+                 output$outline_functionality <- renderUI({
+                   actionButton('add_outline', "Show only city")
+                 })
                })
   
   observeEvent(input$submit_coords, {
@@ -42,6 +57,9 @@ shinyServer(function(input, output, server) {
       setView(
         lng = input$lng_user, lat = input$lat_user, zoom = current_zoom()
       )
+    
+    outline_binary <<- FALSE
+    
   })
   
   observeEvent(input$submit_address, {
@@ -65,6 +83,9 @@ shinyServer(function(input, output, server) {
       clearGroup('city_outline')
     
     outline_binary <<- FALSE
+    output$outline_functionality <- renderUI({
+      actionButton('add_outline', "Show only city")
+    })
   })
   
   
