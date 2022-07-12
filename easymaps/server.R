@@ -27,16 +27,6 @@ shinyServer(function(input, output, server) {
       setView(lng = 0, lat = 0, zoom = 1)
   })
   
-  observeInput(input$map_height | input$map_width, {
-    output$map <- renderLeaflet({
-      leaflet() %>%
-        addTiles(urlTemplate = input$tile) %>%
-        setView(lng = current_center()$lng[1], lat = current_center()$lat[1],
-                zoom = current_zoom())
-    })
-    
-    
-  }) 
   
   observeEvent(input$tile,
                {
