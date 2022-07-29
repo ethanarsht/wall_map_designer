@@ -67,9 +67,12 @@ make_map <- function(lng, lat, zoom, title, location, tile, width, height,
   
   ii <- image_info(i)
   
+  outline_ind <- T
+  
   i_crop <- i %>%
     image_crop(str_c(ii$width - 75, "x", ii$height - 75, "+0+0"), gravity = 'center') %>%
-    image_border('gray', '10x10') %>%
+    pif(outline_ind == F, image_border(., "gray", "10x10")) %>%
+    # image_border('gray', '10x10') %>%
     image_border('white', '200x200+100+100') %>%
     # image_crop('800x950', gravity = 'south') %>%
     image_annotate(toupper(title), size = 50, gravity = "south",

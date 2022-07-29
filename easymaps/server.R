@@ -102,21 +102,26 @@ shinyServer(function(input, output, server) {
   
   
   observeEvent(input$add_outline, {
-    outline <<- as_Spatial(get_city_boundaries(address_str = geo_address))
     
-    wld <- raster::rasterToPolygons(raster::raster(ncol = 1, nrow = 1, crs = proj4string(outline)))
-    
-    msk <- gDifference(wld, outline)
-    
-   
-    leafletProxy('map') %>%
-      clearGroup('city_outline') %>%
-      addPolygons(
-        data = msk,
-        fillOpacity = 1,
-        color = 'white',
-        group = 'city_outline'
-      )
+    city_bounds <- get_city_boundaries(address_str = geo_address)
+    if (!is.na(city_bounds)) {
+      outline <<- as_Spatial(city_bounds)
+      
+      wld <- raster::rasterToPolygons(raster::raster(ncol = 1, nrow = 1, crs = proj4string(outline)))
+      
+      msk <- gDifference(wld, outline)
+      
+      
+      leafletProxy('map') %>%
+        clearGroup('city_outline') %>%
+        addPolygons(
+          data = msk,
+          fillOpacity = 1,
+          color = 'white',
+          group = 'city_outline'
+        )
+      outline_binary <<- TRUE
+    }
     
     output$outline_functionality <- renderUI(
       tagList(
@@ -124,8 +129,6 @@ shinyServer(function(input, output, server) {
         actionButton('backup_outline', 'Backup method')
       )
     )
-    
-    outline_binary <<- TRUE
   })
   
   observeEvent(input$backup_outline, {
