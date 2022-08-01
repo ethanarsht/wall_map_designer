@@ -20,7 +20,7 @@ tile_list <- list(
 
 get_city_boundaries <- function(address_str) {
   
-  address_str <- "Bologna"
+  # address_str <- "Bologna"
   outline_geo <- geo(address_str,
                      method = "osm", full_results = TRUE
   )
@@ -32,34 +32,38 @@ get_city_boundaries <- function(address_str) {
   
   data <- fromJSON(rawToChar(r$content))
   
+  lookups <- c()
+  names <- c()
   for (n in names(data)) {
     print(n)
-    if (data[[n]]$type_name == "OSM Administrative Boundary Level 8") {
-      print(data[[n]])
-      lookup_id <- n
-    }
-  }
-  
-  if (!exists('lookup_id')) {
-    for (n in names(data)) {
-      print(n)
-      if (data[[n]]$type_name == "OSM Administrative Boundary Level 6") {
-        print(data[[n]])
-        lookup_id <- n
-        print(lookup_id)
+    if (str_detect(data[[n]]$type_name, "OSM Administrative Boundary")) {
+        lookups <- c(lookups, n)
+        
+        names <- c(names, data[[n]]$type_name)
       }
-    }
   }
   
-  if (exists('lookup_id')) {
-    mapit_lookup <- httr::GET(str_c("https://global.mapit.mysociety.org/area/", lookup_id, ".geojson"))
-    sf <- geojson_sf(rawToChar(mapit_lookup$content))
-    return(sf)
-  } else {
-    return(NA)
-  }
+  df_lookup <- tibble(
+    lookup = lookups,
+    name = names
+  ) %>%
+    mutate(
+      level = str_extract(name, "[0-9].*") %>% as.numeric()
+    ) %>%
+    arrange(level)
   
+  return(df_lookup)
+ 
+}
+
+lookupid_to_sf <- function(df_lookup, selection) {
   
+  df_lookup_id <- df_lookup %>% filter(level == selection)
+  
+  lookup_id <- df_lookup_id[[1, 'lookup']]
+  mapit_lookup <- httr::GET(str_c("https://global.mapit.mysociety.org/area/", lookup_id, ".geojson"))
+  sf <- geojson_sf(rawToChar(mapit_lookup$content))
+  return(sf)
 }
 
 get_city_boundaries_old <- function(address_str) {

@@ -37,7 +37,8 @@ shinyUI(fluidPage(
              textInput('address_user', 'Street address')
            ),
            actionButton('submit_address', 'Submit address'),
-           uiOutput('outline_functionality')
+           uiOutput('outline_functionality'),
+           uiOutput('outline_dropdown')
            ),
     
     textInput('title', 'Title'),

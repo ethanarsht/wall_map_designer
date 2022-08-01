@@ -103,15 +103,25 @@ shinyServer(function(input, output, server) {
   
   observeEvent(input$add_outline, {
     
-    city_bounds <- get_city_boundaries(address_str = geo_address)
+    df_osm_levels <<- get_city_boundaries(address_str = geo_address)
+    
+    output$outline_dropdown <- renderUI({
+      selectInput('outline_selection',
+                  label = "Select outline level (OpenStreetMap)",
+                  choices = df_osm_levels$level)
+    })
+  })
+  
+  observeEvent(input$outline_selection, {
+    city_bounds <- lookupid_to_sf(df_osm_levels, input$outline_selection)
     if (!is.na(city_bounds)) {
       outline <<- as_Spatial(city_bounds)
-      
+
       wld <- raster::rasterToPolygons(raster::raster(ncol = 1, nrow = 1, crs = proj4string(outline)))
-      
+
       msk <- gDifference(wld, outline)
-      
-      
+
+
       leafletProxy('map') %>%
         clearGroup('city_outline') %>%
         addPolygons(
