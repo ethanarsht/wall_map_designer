@@ -15,9 +15,9 @@ shinyUI(fluidPage(
       column(width = 3,
              numericInput('map_height', label = "Map height in pixels", value = 400, min = 200, max = 1000))
     ),
-    uiOutput(
-      'map_display'
-    ),
+    leafletOutput('map'),
+    uiOutput('mapjs_width'),
+    uiOutput('mapjs_height'),
     column(width = 6,
            fluidRow(
              column(width = 3,

@@ -9,8 +9,16 @@ shinyServer(function(input, output, server) {
     selectInput('tile', 'Select style', choices = tile_list)
   })
   
-  output$map_display <- renderUI({
-    leafletOutput('map', width = input$map_width, height = input$map_height)
+  output$mapjs_width <- renderUI({
+    tags$script(HTML(paste0(
+      'document.getElementById("map").style.width="', input$map_width, 'px";'
+    )))
+  })
+  
+  output$mapjs_height <- renderUI({
+    tags$script(HTML(paste0(
+      'document.getElementById("map").style.height="', input$map_height, 'px";'
+    )))
   })
   
   lng_reactive <- reactive({
