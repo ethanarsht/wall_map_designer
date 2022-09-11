@@ -84,6 +84,8 @@ shinyServer(function(input, output, server) {
     output$outline_functionality <- renderUI({
       actionButton('add_outline', "Show only city")
     })
+    
+    output$outline_dropdown <- NULL
   })
   
   
@@ -176,6 +178,8 @@ shinyServer(function(input, output, server) {
     output$outline_functionality <- renderUI({
       actionButton('add_outline', "Show only city")
     })
+    
+    output$outline_dropdown <- NULL
     
     print(input$add_outline)
   })

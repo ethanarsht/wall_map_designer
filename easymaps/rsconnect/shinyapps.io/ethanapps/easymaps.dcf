@@ -5,9 +5,9 @@ account: ethanapps
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 6525307
-bundleId: 6165839
+bundleId: 6252972
 url: https://ethanapps.shinyapps.io/easymaps/
-when: 1659623456.35983
-lastSyncTime: 1659623456.35984
+when: 1661888614.62523
+lastSyncTime: 1661888614.62527
 asMultiple: FALSE
 asStatic: FALSE
