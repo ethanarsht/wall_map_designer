@@ -104,7 +104,7 @@ shinyServer(function(input, output, server) {
   observeEvent(input$submit_address, {
     if (input$city_user != "") {
       output$outline_functionality <- renderUI({
-        actionButton('add_outline', "Show only city")
+        actionButton('add_outline', "Add area outline")
       })
     }
   })
@@ -116,9 +116,19 @@ shinyServer(function(input, output, server) {
     df_osm_levels <<- get_city_boundaries(address_str = geo_address)
     
     output$outline_dropdown <- renderUI({
-      selectInput('outline_selection',
-                  label = "Select outline level (OpenStreetMap)",
-                  choices = df_osm_levels$level)
+      tagList(
+        fluidRow(
+          column(width = 3,
+                 selectInput('outline_selection',
+                             label = "Select outline level",
+                             choices = df_osm_levels$level)
+          ),
+          column(width = 3,
+                 h5(paste0("Use the dropdown to select an area outline. Each number represents an OpenStreetMap",
+                             " outline level. Lower numbers are larger areas such as countries. Higher numbers are",
+                             " smaller areas such as cities or neighborhoods.")))
+        )
+      )
     })
   })
   
@@ -145,8 +155,8 @@ shinyServer(function(input, output, server) {
     
     output$outline_functionality <- renderUI(
       tagList(
-        actionButton('remove_outline', 'Show all'),
-        actionButton('backup_outline', 'Backup method')
+        actionButton('remove_outline', 'Remove outline')
+        # actionButton('backup_outline', 'Backup method')
       )
     )
   })
