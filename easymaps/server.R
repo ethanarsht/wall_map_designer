@@ -5,6 +5,10 @@ shinyServer(function(input, output, server) {
   
   source('map_script.R')
   
+  background_color <- reactive(
+    input$background
+  )
+  
   output$tile_functionality <- renderUI({
     selectInput('tile', 'Select style', choices = tile_list)
   })
@@ -31,7 +35,8 @@ shinyServer(function(input, output, server) {
   
   output$map <- renderLeaflet({
     leaflet() %>%
-      addTiles(urlTemplate = input$tile) %>%
+      pif(input$tile == 'watercolor', addProviderTiles(., providers$Stamen.Watercolor)) %>%
+      pif(input$tile != 'watercolor', addTiles(., urlTemplate = input$tile)) %>%
       setView(lng = 0, lat = 0, zoom = 1)
   })
   
@@ -45,9 +50,26 @@ shinyServer(function(input, output, server) {
                            zoom = current_zoom()
                    )
                  
-                 output$outline_functionality <- renderUI({
-                   actionButton('add_outline', "Show only city")
-                 })
+                 req(input$outline_selection)
+                 city_bounds <- lookupid_to_sf(df_osm_levels, input$outline_selection)
+                 if (!is.na(city_bounds)) {
+                   outline <<- as_Spatial(city_bounds)
+                   
+                   wld <- raster::rasterToPolygons(raster::raster(ncol = 1, nrow = 1, crs = proj4string(outline)))
+                   
+                   msk <- gDifference(wld, outline)
+                   
+                   
+                   leafletProxy('map') %>%
+                     clearGroup('city_outline') %>%
+                     addPolygons(
+                       data = msk,
+                       fillOpacity = 1,
+                       color = 'white',
+                       group = 'city_outline'
+                     )
+                   outline_binary <<- TRUE
+                 }
                })
   
   observeEvent(input$submit_coords, {
@@ -97,10 +119,6 @@ shinyServer(function(input, output, server) {
     input$map_center
   })
   
-  output$lng <- renderText(current_center()$lng[1])
-  output$lat <- renderText(current_center()$lat[1])
-  output$zoom <- renderText(current_zoom())
-  
   observeEvent(input$submit_address, {
     if (input$city_user != "") {
       output$outline_functionality <- renderUI({
@@ -141,12 +159,13 @@ shinyServer(function(input, output, server) {
 
       msk <- gDifference(wld, outline)
 
-
+      print(background_color())
       leafletProxy('map') %>%
         clearGroup('city_outline') %>%
         addPolygons(
           data = msk,
           fillOpacity = 1,
+          fillColor = background_color(),
           color = 'white',
           group = 'city_outline'
         )
@@ -174,7 +193,7 @@ shinyServer(function(input, output, server) {
       addPolygons(
         data = msk,
         fillOpacity = 1,
-        color = 'white',
+        color = background_color(),
         group = 'city_outline'
       )
   })

@@ -49,7 +49,7 @@ shinyUI(fluidPage(
     uiOutput('mapjs_height'),
     
     fluidRow(
-      h3("4. Add an outline to your map")
+      h3("4. Optional: Add an outline and background to your map")
     ),
     
     fluidRow(
@@ -58,7 +58,11 @@ shinyUI(fluidPage(
     ),
     
     fluidRow(
-      h3("Add a title and subtitle")
+      colourInput("background", "Background color", "white")
+    ),
+    
+    fluidRow(
+      h3("5. Add a title and subtitle")
     ),
     
     textInput('title', 'Title'),
